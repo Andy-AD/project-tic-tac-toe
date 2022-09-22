@@ -1,4 +1,58 @@
 (function () {
+    
+    const mainDiv = document.getElementById('main');
+    const newGameButton = document.getElementById('new-game');
+    const startNewGameDiv = document.getElementById('start-screen');
+    const selectModeText = createElement({type: 'h2', textContent: 'Select mode:'});
+    const playerVsPlayerButton = createElement({type: 'button', textContent: 'Player VS Player', id: 'player-player-button'});
+    let playerVsComputerButton = document.createElement('button');
+
+
+    newGameButton.addEventListener('click', newGame);
+
+    function newGame() {
+        newGameButton.remove();
+        chooseGameMode();
+    }
+
+    function chooseGameMode() {
+        
+        playerVsPlayerButton.textContent = '';
+        playerVsPlayerButton.setAttribute('id', '');
+        
+        playerVsComputerButton.textContent = 'Player VS Computer';
+        playerVsComputerButton.setAttribute('id', 'player-computer-button');
+
+        startNewGameDiv.appendChild(selectModeText);
+        startNewGameDiv.appendChild(playerVsPlayerButton);
+        startNewGameDiv.appendChild(playerVsComputerButton);        
+    }
+
+    function createElement(el) {
+        // el -- is an object containing type, text content and id
+        let element = document.createElement(el.type);
+
+        if (el.textContent) {
+            element.textContent = el.textContent;
+        }
+
+        if (el.id) {
+            element.setAttribute('id', el.id)
+        }
+
+        return element;
+    }
+
+
+
+})()
+
+
+
+
+
+/* (function () {
+
     const createPlayer = (name, marker) => {
         return { name, marker };
     };
@@ -107,32 +161,4 @@
     const player2 = createPlayer('Player2', 'O');
 
 })();
-
-/* (function() {
-
-    const gameBoardDiv = document.getElementById('game-board');
-
-    const GameBoard = {
-
-        gameboard: ['','','','','','','','',''],
-
-        render() {
-            this.gameboard.forEach((marker, index) => {
-                const box = this.createBox(`box-${index}`, marker);
-                gameBoardDiv.appendChild(box);
-            })
-        },
-        createBox(id,text) {
-            let box = document.createElement('div');
-            box.textContent = text;
-            box.setAttribute('id', id);
-            return box;
-        }, 
-        placeMarker(boxNumber, marker) {
-            this.gameboard[boxNumber] = marker;
-            this.render();
-        }   
-    }
-    GameBoard.render();
-
-})() */
+ */
