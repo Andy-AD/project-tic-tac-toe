@@ -50,7 +50,41 @@ body {
     margin-bottom: 0.5em;
 }
 
-footer {
+#game-screen {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#display-element {
+    height: 200px;
+    font-size: 1.6em;
+}
+
+#gameboard {
+    height: 600px;
+    width: 600px;
+    background-color: var(--main-dark-background-color);
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: repeat(3, 1fr);
+    gap: 5px;
+}
+
+#gameboard > div {
+    background-color: var(--main-dark-color);
+    font-size: 4em;
+}
+
+.highlight {
+    color: red;
+}
+
+footer,
+#gameboard > div,
+#display-element {
     display: flex;
     justify-content: center;
     align-items: center;
