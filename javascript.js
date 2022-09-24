@@ -16,6 +16,10 @@
             return false;
         }
 
+        function getMarker() {
+            return currentMarker;
+        }
+
         function createBoard() {            
             if (isCreated) {
                 resetBoard();
@@ -46,8 +50,7 @@
         }
 
         return {
-            createBoard, updateBoard, resetBoard
-        }
+            createBoard, updateBoard, resetBoard, getMarker       }
 
     })();
 
@@ -66,9 +69,7 @@
         }
 
         function checkForWinner() {
-            if (!gameArray.includes('')) {
-                return ({ status: "It's a tie!", result: 0 })
-            }
+           
             for (let i = 0; i <= 7; i += 3) {
                 let sum = gameArray[i] + gameArray[i + 1] + gameArray[i + 2];
                 if (sum === 'XXX' || sum === 'OOO') {
@@ -89,6 +90,9 @@
             if (sum === 'XXX' || sum === 'OOO') {
                 return ({ coordinates: [2, 4, 6], status: `The winner is ${sum[0]}!`, result: sum[0] })
             }
+            if (!gameArray.includes('')) {
+                return ({ status: "It's a tie!", result: 0 })
+            }
             return false;
         }
 
@@ -106,8 +110,30 @@
             gameArray = gameArray = ['', '', '', '', '', '', '', '', ''];
         }
 
+        function calculateMove() {
+            if (difficultyLevel === 'Easy') {
+                return easyMode();
+            }
+        }
+
+        function easyMode() {
+            let successful = false;
+            let move;
+            while(!successful) {
+                move = Math.floor(Math.random() * 9);
+                if (gameArray[move] === '') {
+                    successful = true;
+                }
+            }
+            return move;
+        }
+
+        function getMode() {
+            return gameMode;
+        }
+
         return {
-            checkForWinner, updateArray, newGame, restartGame
+            checkForWinner, updateArray, newGame, restartGame, calculateMove, getMode
         }
     })();
 
@@ -122,29 +148,62 @@
     const gameScreenDiv = createElement({ type: 'div', id: 'game-screen' });
     const buttonContainer = createElement({ type: 'div', id: 'button-container' });
     let displayElement = createElement({ type: 'div', textContent: 'Make your move...', id: 'display-element' });
+    const easyButton = createElement({type: 'button', textContent: 'Easy', id: 'easy-mode-button'});
+    const normalButton = createElement({type: 'button', textContent: 'Normal', id: 'normal-mode-button'});
+    const hardButton = createElement({type: 'button', textContent: 'Hard', id: 'hard-mode-button'});
+    const chooseDifficultyScreen = createElement({type: 'div', id: 'difficulty-container'});
+    const selectDifficultyText = createElement({ type: 'h2', textContent: 'Select difficulty:' });
     let clickEventListenerAttached = false;
 
 
     newGameButton.addEventListener('click', createChooseGameModeScreen);
     playerVsPlayerButton.addEventListener('click', startPlayerVsPlayerGame);
     restartButton.addEventListener('click', restart);
+    playerVsComputerButton.addEventListener('click', chooseDifficulty);
+    easyButton.addEventListener('click', startPlayerVsComputerGame);
+    normalButton.addEventListener('click', startPlayerVsComputerGame);
+    hardButton.addEventListener('click', startPlayerVsComputerGame);
 
     function render() {
         let result = Game.checkForWinner();
         if (result) {
             gameScreenDiv.removeEventListener('click', clickListener);
             clickEventListenerAttached = false;
-            updateDisplay(result.status);
+            updateDisplayText(result.status);
             if (result.coordinates) {
                 highlightBoxes(result.coordinates);
             }
-        }
+            return;
+        } 
+        if (Gameboard.getMarker() === 'O' && Game.getMode() === 'Player VS Computer') {
+            let computerMove = Game.calculateMove();
+            let moveIsSubmitted = Gameboard.updateBoard(computerMove);
+            if (moveIsSubmitted) {
+                render();
+            }
+        }      
+    }
+
+    function chooseDifficulty() {
+        chooseGameModeScreen.remove();
+        chooseDifficultyScreen.appendChild(selectDifficultyText);
+        chooseDifficultyScreen.appendChild(easyButton);
+        chooseDifficultyScreen.appendChild(normalButton);
+        chooseDifficultyScreen.appendChild(hardButton);
+        mainDiv.appendChild(chooseDifficultyScreen);
     }
 
     function startPlayerVsPlayerGame() {
         chooseGameModeScreen.remove();
         createGameDisplay();
         Game.newGame('Player VS Player');
+    }
+
+    function startPlayerVsComputerGame(event) {
+        let difficulty = event.composedPath()[0].textContent;
+        chooseDifficultyScreen.remove();
+        createGameDisplay();
+        Game.newGame('Player VS Computer', difficulty);        
     }
 
     function createGameDisplay() {
@@ -157,7 +216,7 @@
             buttonContainer.appendChild(restartButton);
             gameScreenDiv.appendChild(buttonContainer);
         } else {
-            updateDisplay('Make your move...')
+            updateDisplayText('Make your move...')
         }
         gameScreenDiv.addEventListener('click', clickListener);
         clickEventListenerAttached = true;
@@ -181,7 +240,7 @@
         }
     }
 
-    function updateDisplay(text) {
+    function updateDisplayText(text) {
         displayElement.textContent = text;
     }
 
@@ -198,7 +257,7 @@
         if (!clickEventListenerAttached) {
             gameScreenDiv.addEventListener('click', clickListener);
         }
-        updateDisplay('Make your move...');
+        updateDisplayText('Make your move...');
     }
 
     function createElement(el) {
@@ -215,7 +274,5 @@
 
         return element;
     }
-
-
 
 })()
