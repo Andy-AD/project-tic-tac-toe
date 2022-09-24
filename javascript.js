@@ -113,6 +113,8 @@
         function calculateMove() {
             if (difficultyLevel === 'Easy') {
                 return easyMode();
+            } else if (difficultyLevel === 'Normal') {
+                return normalMode();
             }
         }
 
@@ -126,6 +128,64 @@
                 }
             }
             return move;
+        }
+
+        function normalMode() {
+            if (gameArray[4] === '') {
+                return 4;
+            }
+            sum = gameArray[0] + gameArray[4] + gameArray[8];
+            if (sum.length === 2) {
+                if (gameArray[0] === '') {
+                    return 0;
+                } else {
+                    return 8;
+                }
+            }
+            sum = gameArray[2] + gameArray[4] + gameArray[6];
+            if (sum.length === 2) {
+                if (gameArray[2] === '') {
+                    return 2;
+                } else {
+                    return 6;
+                }
+            }
+            for (let i = 0; i <= 7; i += 3) {
+                let sum = gameArray[i] + gameArray[i + 1] + gameArray[i + 2];
+                if (sum.length === 2) {
+                    if (gameArray[i] === '') {
+                        return i;
+                    } else if (gameArray[i+1] === '') {
+                        return i+1;
+                    } else {
+                        return i+2;
+                    }
+                }
+            }
+            for (let i = 0; i <= 3; i++) {
+                let sum = gameArray[i] + gameArray[i + 3] + gameArray[i + 6];
+                if (sum.length === 2) {
+                    if (gameArray[i] === '') {
+                        return i;
+                    } else if (gameArray[i+3] === '') {
+                        return i+3;
+                    } else {
+                        return i+6;
+                    }
+                }
+            }
+            for (let i = 0; i <= 8; i+=2) {
+                if (gameArray[i] === '') {
+                    return i;
+                }
+            }
+            for (let i = 1; i <= 7; i+=2) {
+                if (gameArray[i] === '') {
+                    return i;
+                }
+            }
+            let other = [1,3,5,7];
+                       
         }
 
         function getMode() {
