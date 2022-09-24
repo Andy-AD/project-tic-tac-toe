@@ -4,6 +4,7 @@
 
         const gameboard = createElement({ type: 'div', id: 'gameboard' });
         let currentMarker = 'X';
+        let isCreated = false;
 
         function updateBoard(index) {
             let updateResult = Game.updateArray(index, currentMarker);
@@ -15,12 +16,19 @@
             return false;
         }
 
-        function createBoard() {
-            for (let i = 0; i <= 8; i++) {
-                const box = createElement({ type: 'div', textContent: '', id: `box-${i}` });
-                gameboard.appendChild(box);
+        function createBoard() {            
+            if (isCreated) {
+                resetBoard();
+                return 'already created'
+            } else {
+                for (let i = 0; i <= 8; i++) {
+                    let box = createElement({ type: 'div', textContent: '', id: `box-${i}` });
+                    gameboard.appendChild(box);
+                }
+                isCreated = true;
+                
+                return gameboard;
             }
-            return gameboard;
         };
 
         function updateBox(index, marker) {
@@ -28,8 +36,17 @@
             box.textContent = marker;
         }
 
+        function resetBoard() {
+            currentMarker = 'X';
+            for (let i = 0; i <= 8; i++) {
+                let box = document.getElementById(`box-${i}`);
+                box.textContent = '';
+                box.classList.remove('highlight');
+            }
+        }
+
         return {
-            createBoard, updateBoard
+            createBoard, updateBoard, resetBoard
         }
 
     })();
@@ -37,7 +54,7 @@
     const Game = (() => {
         let gameArray = ['', '', '', '', '', '', '', '', ''];
 
-        let mode = '';
+        let gameMode = '';
         let difficultyLevel = '';
 
         function updateArray(index, marker) {
@@ -50,12 +67,12 @@
 
         function checkForWinner() {
             if (!gameArray.includes('')) {
-                return ({status: "It's a tie!", result: 0})
+                return ({ status: "It's a tie!", result: 0 })
             }
             for (let i = 0; i <= 7; i += 3) {
                 let sum = gameArray[i] + gameArray[i + 1] + gameArray[i + 2];
                 if (sum === 'XXX' || sum === 'OOO') {
-                    return ({ coordinates: [i, i + 1, i + 2], status: `The winner is ${sum[0]}!`, result: sum[0]})
+                    return ({ coordinates: [i, i + 1, i + 2], status: `The winner is ${sum[0]}!`, result: sum[0] })
                 }
             }
             for (let i = 0; i <= 3; i++) {
@@ -66,7 +83,7 @@
             }
             sum = gameArray[0] + gameArray[4] + gameArray[8];
             if (sum === 'XXX' || sum === 'OOO') {
-                return ({ coordinates: [0, 4, 8], status: `The winner is ${sum[0]}!`, result: sum[0]})
+                return ({ coordinates: [0, 4, 8], status: `The winner is ${sum[0]}!`, result: sum[0] })
             }
             sum = gameArray[2] + gameArray[4] + gameArray[6];
             if (sum === 'XXX' || sum === 'OOO') {
@@ -75,29 +92,48 @@
             return false;
         }
 
+        function newGame(mode, difficulty) {
+            gameArray = ['', '', '', '', '', '', '', '', ''];
+            if (mode === 'Player VS Player') {
+                gameMode = mode;
+            } else {
+                gameMode = mode;
+                difficultyLevel = difficulty;
+            }
+        } 
+
+        function restartGame() {
+            gameArray = gameArray = ['', '', '', '', '', '', '', '', ''];
+        }
+
         return {
-            checkForWinner, updateArray, mode
+            checkForWinner, updateArray, newGame, restartGame
         }
     })();
 
     const mainDiv = document.getElementById('main');
-    const newGameButton = document.getElementById('new-game');
-    const startNewGameDiv = document.getElementById('start-screen');
+    const newGameButton = document.getElementById('new-game-button');
+    const gameName = createElement({ type: 'h1', textContent: 'Tic-Tac-Toe' });
+    const restartButton = createElement({ type: 'button', textContent: 'Restart', id: 'restart-button' });
+    const chooseGameModeScreen = createElement({ type: 'div', id: 'choose-mode-screen' });
     const selectModeText = createElement({ type: 'h2', textContent: 'Select mode:' });
     const playerVsPlayerButton = createElement({ type: 'button', textContent: 'Player VS Player', id: 'player-player-button' });
     const playerVsComputerButton = createElement({ type: 'button', textContent: 'Player VS Computer', id: 'player-computer-button' });
     const gameScreenDiv = createElement({ type: 'div', id: 'game-screen' });
-    let displayElement = createElement({ type: 'div', textContent: 'Make your move...', id: 'display-element' })
+    const buttonContainer = createElement({ type: 'div', id: 'button-container' });
+    let displayElement = createElement({ type: 'div', textContent: 'Make your move...', id: 'display-element' });
+    let clickEventListenerAttached = false;
 
 
     newGameButton.addEventListener('click', createChooseGameModeScreen);
     playerVsPlayerButton.addEventListener('click', startPlayerVsPlayerGame);
-    gameScreenDiv.addEventListener('click', clickListener);
+    restartButton.addEventListener('click', restart);
 
     function render() {
         let result = Game.checkForWinner();
         if (result) {
             gameScreenDiv.removeEventListener('click', clickListener);
+            clickEventListenerAttached = false;
             updateDisplay(result.status);
             if (result.coordinates) {
                 highlightBoxes(result.coordinates);
@@ -106,25 +142,34 @@
     }
 
     function startPlayerVsPlayerGame() {
-        startNewGameDiv.remove();
+        chooseGameModeScreen.remove();
         createGameDisplay();
-        Game.mode = 'Player VS Player';
+        Game.newGame('Player VS Player');
     }
 
     function createGameDisplay() {
-
-        let gameboard = Gameboard.createBoard();
-
-        gameScreenDiv.appendChild(displayElement);
-        gameScreenDiv.appendChild(gameboard);
         mainDiv.appendChild(gameScreenDiv);
+        let gameboard = Gameboard.createBoard();
+        if (gameboard !== 'already created') {
+            gameScreenDiv.appendChild(displayElement);
+            gameScreenDiv.appendChild(gameboard);
+            buttonContainer.appendChild(newGameButton);
+            buttonContainer.appendChild(restartButton);
+            gameScreenDiv.appendChild(buttonContainer);
+        } else {
+            updateDisplay('Make your move...')
+        }
+        gameScreenDiv.addEventListener('click', clickListener);
+        clickEventListenerAttached = true;
     }
 
     function createChooseGameModeScreen() {
-        newGameButton.remove();
-        startNewGameDiv.appendChild(selectModeText);
-        startNewGameDiv.appendChild(playerVsPlayerButton);
-        startNewGameDiv.appendChild(playerVsComputerButton);
+        mainDiv.firstElementChild.remove();
+        chooseGameModeScreen.appendChild(gameName);
+        chooseGameModeScreen.appendChild(selectModeText);
+        chooseGameModeScreen.appendChild(playerVsPlayerButton);
+        chooseGameModeScreen.appendChild(playerVsComputerButton);
+        mainDiv.appendChild(chooseGameModeScreen);
     }
 
     function clickListener(event) {
@@ -147,6 +192,15 @@
         });
     }
 
+    function restart() {
+        Game.restartGame();
+        Gameboard.resetBoard();
+        if (!clickEventListenerAttached) {
+            gameScreenDiv.addEventListener('click', clickListener);
+        }
+        updateDisplay('Make your move...');
+    }
+
     function createElement(el) {
         // el -- is an object containing type, text content and id
         let element = document.createElement(el.type);
@@ -165,119 +219,3 @@
 
 
 })()
-
-
-
-
-
-/* (function () {
-
-    const createPlayer = (name, marker) => {
-        return { name, marker };
-    };
-
-    const Gameboard = (() => {
-
-        const gameBoardDiv = document.getElementById('game-board');
-        let gameboardArray = ['', '', '', '', '', '', '', '', ''];
-        let isBoardCreated = false;
-        let currentMarker = 'X';
-
-
-        gameBoardDiv.addEventListener('click', clickListener);
-
-        const render = () => {
-            isBoardCreated ? updateMarker() : createBoard();
-            let winner = checkForWinner();
-            if (winner) {
-                gameOver(winner);
-            }
-        };
-
-        function createBoard() {
-            for (let i = 0; i <= 8; i++) {
-                const box = createBox(`box-${i}`);
-                gameBoardDiv.appendChild(box);
-            }
-            isBoardCreated = true;
-        };
-
-        function createBox(id) {
-            let box = document.createElement('div');
-            box.setAttribute('id', id);
-            return box;
-        };
-
-        function placeMarker(boxNumber) {
-            if (gameboardArray[boxNumber] === '') {
-
-                gameboardArray[boxNumber] = currentMarker;
-
-                changeMarker();
-
-                render();
-            }
-        }
-
-        function changeMarker() {
-            (currentMarker === 'X') ? currentMarker = 'O' : currentMarker = 'X';
-        }
-
-        function clickListener(event) {
-            let boxId = event.composedPath()[0].id;
-            let boxNumber = boxId.split('-');
-            placeMarker(boxNumber[1]);
-        }
-
-        function updateMarker() {
-            gameboardArray.forEach((marker, index) => {
-                let box = document.getElementById(`box-${index}`);
-                box.textContent = marker;
-            })
-        }
-
-        function checkForWinner() {
-            for (let i = 0; i <= 7; i += 3) {
-                let sum = gameboardArray[i] + gameboardArray[i + 1] + gameboardArray[i + 2];
-                if (sum === 'XXX' || sum === 'OOO') {
-                    console.log('winner', sum)
-                    return ([i, i + 1, i + 2])
-                }
-            }
-            for (let i = 0; i <= 3; i++) {
-                let sum = gameboardArray[i] + gameboardArray[i + 3] + gameboardArray[i + 6];
-                if (sum === 'XXX' || sum === 'OOO') {
-                    console.log('winner', sum)
-                    return ([i, i + 3, i + 6])
-                }
-            }
-            sum = gameboardArray[0] + gameboardArray[4] + gameboardArray[8];
-            if (sum === 'XXX' || sum === 'OOO') {
-                console.log('winner', sum)
-                return ([0, 4, 8])
-            }
-            sum = gameboardArray[2] + gameboardArray[4] + gameboardArray[6];
-            if (sum === 'XXX' || sum === 'OOO') {
-                console.log('winner', sum);
-                return ([2, 4, 6])
-            }
-        }
-
-        function gameOver(coordinates){
-            coordinates.forEach(index => {
-                let box = document.getElementById(`box-${index}`);
-                box.classList.add('highlight');
-            })
-            gameBoardDiv.removeEventListener('click', clickListener);
-        }
-
-        return { render };
-    })();
-
-    Gameboard.render();
-
-    const player1 = createPlayer('Player1', 'X');
-    const player2 = createPlayer('Player2', 'O');
-
-})();
- */

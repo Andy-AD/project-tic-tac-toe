@@ -18,7 +18,8 @@ body {
     grid-template-rows: 1fr 60px;
 }
 
-.start {
+.start,
+#choose-mode-screen {
     width: 100%;
     height: 100%;
     display: flex;
@@ -27,17 +28,20 @@ body {
     align-items: center;
 }
 
-.start h1 {
+h1 {
     font-size: 4em;
     margin-bottom: 1em;
 }
 
-#new-game {
+#new-game-button,
+#restart-button {
+    width: 9em;
+    height: 2em;
     font-size: 1.6em;
-    padding: 15px 20px;
+    margin: 20px 20px;
 }
 
-.start h2 {
+h2 {
     font-size: 2.5em;
     margin-bottom: 0.5em;
 }
@@ -76,6 +80,10 @@ body {
 #gameboard > div {
     background-color: var(--main-dark-color);
     font-size: 4em;
+}
+
+#gameboard > div:hover {
+    cursor: pointer;
 }
 
 .highlight {
