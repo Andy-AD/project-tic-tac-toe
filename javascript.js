@@ -68,29 +68,31 @@
             return false;
         }
 
-        function checkForWinner() {
+        function checkForWinner(gameboardArray) {
+            
+            let gameboard = gameboardArray || gameArray;
            
             for (let i = 0; i <= 7; i += 3) {
-                let sum = gameArray[i] + gameArray[i + 1] + gameArray[i + 2];
+                let sum = gameboard[i] + gameboard[i + 1] + gameboard[i + 2];
                 if (sum === 'XXX' || sum === 'OOO') {
                     return ({ coordinates: [i, i + 1, i + 2], status: `The winner is ${sum[0]}!`, result: sum[0] })
                 }
             }
             for (let i = 0; i <= 3; i++) {
-                let sum = gameArray[i] + gameArray[i + 3] + gameArray[i + 6];
+                let sum = gameboard[i] + gameboard[i + 3] + gameboard[i + 6];
                 if (sum === 'XXX' || sum === 'OOO') {
                     return ({ coordinates: [i, i + 3, i + 6], status: `The winner is ${sum[0]}!`, result: sum[0] })
                 }
             }
-            sum = gameArray[0] + gameArray[4] + gameArray[8];
+            sum = gameboard[0] + gameboard[4] + gameboard[8];
             if (sum === 'XXX' || sum === 'OOO') {
                 return ({ coordinates: [0, 4, 8], status: `The winner is ${sum[0]}!`, result: sum[0] })
             }
-            sum = gameArray[2] + gameArray[4] + gameArray[6];
+            sum = gameboard[2] + gameboard[4] + gameboard[6];
             if (sum === 'XXX' || sum === 'OOO') {
                 return ({ coordinates: [2, 4, 6], status: `The winner is ${sum[0]}!`, result: sum[0] })
             }
-            if (!gameArray.includes('')) {
+            if (!gameboard.includes('')) {
                 return ({ status: "It's a tie!", result: 0 })
             }
             return false;
@@ -133,6 +135,46 @@
         function normalMode() {
             if (gameArray[4] === '') {
                 return 4;
+            }
+            sum = gameArray[0] + gameArray[4] + gameArray[8];
+            if (sum === 'XX') {
+                if (gameArray[0] === '') {
+                    return 0;
+                } else {
+                    return 8;
+                }
+            }
+            sum = gameArray[2] + gameArray[4] + gameArray[6];
+            if (sum === 'XX') {
+                if (gameArray[2] === '') {
+                    return 2;
+                } else {
+                    return 6;
+                }
+            }
+            for (let i = 0; i <= 7; i += 3) {
+                let sum = gameArray[i] + gameArray[i + 1] + gameArray[i + 2];
+                if (sum === 'XX') {
+                    if (gameArray[i] === '') {
+                        return i;
+                    } else if (gameArray[i+1] === '') {
+                        return i+1;
+                    } else {
+                        return i+2;
+                    }
+                }
+            }
+            for (let i = 0; i <= 3; i++) {
+                let sum = gameArray[i] + gameArray[i + 3] + gameArray[i + 6];
+                if (sum === 'XX') {
+                    if (gameArray[i] === '') {
+                        return i;
+                    } else if (gameArray[i+3] === '') {
+                        return i+3;
+                    } else {
+                        return i+6;
+                    }
+                }
             }
             sum = gameArray[0] + gameArray[4] + gameArray[8];
             if (sum.length === 2) {
@@ -183,9 +225,7 @@
                 if (gameArray[i] === '') {
                     return i;
                 }
-            }
-            let other = [1,3,5,7];
-                       
+            }                       
         }
 
         function getMode() {
