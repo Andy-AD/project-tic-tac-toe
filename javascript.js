@@ -20,7 +20,7 @@
             return currentMarker;
         }
 
-        function createBoard() {            
+        function createBoard() {
             if (isCreated) {
                 resetBoard();
                 return 'already created'
@@ -30,7 +30,7 @@
                     gameboard.appendChild(box);
                 }
                 isCreated = true;
-                
+
                 return gameboard;
             }
         };
@@ -50,7 +50,8 @@
         }
 
         return {
-            createBoard, updateBoard, resetBoard, getMarker       }
+            createBoard, updateBoard, resetBoard, getMarker
+        }
 
     })();
 
@@ -68,10 +69,15 @@
             return false;
         }
 
+        function getGameArray() {
+            let array = [...gameArray]
+            return array;
+        }
+
         function checkForWinner(gameboardArray) {
-            
-            let gameboard = gameboardArray || gameArray;
-           
+
+            let gameboard = gameboardArray || getGameArray();
+
             for (let i = 0; i <= 7; i += 3) {
                 let sum = gameboard[i] + gameboard[i + 1] + gameboard[i + 2];
                 if (sum === 'XXX' || sum === 'OOO') {
@@ -106,10 +112,10 @@
                 gameMode = mode;
                 difficultyLevel = difficulty;
             }
-        } 
+        }
 
         function restartGame() {
-            gameArray = gameArray = ['', '', '', '', '', '', '', '', ''];
+            gameArray = ['', '', '', '', '', '', '', '', ''];
         }
 
         function calculateMove() {
@@ -117,13 +123,15 @@
                 return easyMode();
             } else if (difficultyLevel === 'Normal') {
                 return normalMode();
+            } else if (difficultyLevel === 'Hard') {
+                return hardMode()
             }
         }
 
         function easyMode() {
             let successful = false;
             let move;
-            while(!successful) {
+            while (!successful) {
                 move = Math.floor(Math.random() * 9);
                 if (gameArray[move] === '') {
                     successful = true;
@@ -133,6 +141,7 @@
         }
 
         function normalMode() {
+            console.log(gameArray)
             if (gameArray[4] === '') {
                 return 4;
             }
@@ -157,10 +166,10 @@
                 if (sum === 'XX') {
                     if (gameArray[i] === '') {
                         return i;
-                    } else if (gameArray[i+1] === '') {
-                        return i+1;
+                    } else if (gameArray[i + 1] === '') {
+                        return i + 1;
                     } else {
-                        return i+2;
+                        return i + 2;
                     }
                 }
             }
@@ -169,10 +178,10 @@
                 if (sum === 'XX') {
                     if (gameArray[i] === '') {
                         return i;
-                    } else if (gameArray[i+3] === '') {
-                        return i+3;
+                    } else if (gameArray[i + 3] === '') {
+                        return i + 3;
                     } else {
-                        return i+6;
+                        return i + 6;
                     }
                 }
             }
@@ -197,10 +206,10 @@
                 if (sum.length === 2) {
                     if (gameArray[i] === '') {
                         return i;
-                    } else if (gameArray[i+1] === '') {
-                        return i+1;
+                    } else if (gameArray[i + 1] === '') {
+                        return i + 1;
                     } else {
-                        return i+2;
+                        return i + 2;
                     }
                 }
             }
@@ -209,23 +218,80 @@
                 if (sum.length === 2) {
                     if (gameArray[i] === '') {
                         return i;
-                    } else if (gameArray[i+3] === '') {
-                        return i+3;
+                    } else if (gameArray[i + 3] === '') {
+                        return i + 3;
                     } else {
-                        return i+6;
+                        return i + 6;
                     }
                 }
             }
-            for (let i = 0; i <= 8; i+=2) {
+            for (let i = 0; i <= 8; i += 2) {
                 if (gameArray[i] === '') {
                     return i;
                 }
             }
-            for (let i = 1; i <= 7; i+=2) {
+            for (let i = 1; i <= 7; i += 2) {
                 if (gameArray[i] === '') {
                     return i;
                 }
-            }                       
+            }
+        }
+
+        function hardMode() {
+            let move = minimax(getGameArray(), 'O').index;
+            return move
+        }
+
+        function minimax(board, player) {
+            let moves = [];
+            let availableMoves = [];
+            let isWon = checkForWinner(board);
+            if (isWon) {
+                if (isWon.result === 'O') {
+                    return { score: 10 }
+                } else if (isWon.result === 'X') {
+                    return { score: -10 };
+                } else if (availableMoves.length === 0) {
+                    return { score: 0 };
+                }
+            } else {
+                board.forEach((item, index) => {
+                    if (item === '') {
+                        availableMoves.push(index);
+                    }
+                });
+                availableMoves.forEach(item => {
+                    let move = {};
+                    move.index = item;
+                    let tempBoard = [...board];
+                    let tempPlayer;
+                    tempBoard[item] = player;
+                    (player === 'X') ? tempPlayer = 'O' : tempPlayer = 'X';
+                    let result = minimax(tempBoard, tempPlayer);
+                    move.score = result.score;
+                    moves.push(move);
+                });
+            }
+
+            let bestMove;
+            if (player === 'X') {
+                let bestScore = 100;
+                moves.forEach((move, index) => {
+                    if (move.score < bestScore) {
+                        bestScore = move.score;
+                        bestMove = index;
+                    }
+                })
+            } else {
+                let bestScore = -100;
+                moves.forEach((move, index) => {
+                    if (move.score > bestScore) {
+                        bestScore = move.score;
+                        bestMove = index;
+                    }
+                })
+            }
+            return moves[bestMove];
         }
 
         function getMode() {
@@ -233,7 +299,7 @@
         }
 
         return {
-            checkForWinner, updateArray, newGame, restartGame, calculateMove, getMode
+            checkForWinner, updateArray, newGame, restartGame, calculateMove, getMode, getGameArray
         }
     })();
 
@@ -248,10 +314,10 @@
     const gameScreenDiv = createElement({ type: 'div', id: 'game-screen' });
     const buttonContainer = createElement({ type: 'div', id: 'button-container' });
     let displayElement = createElement({ type: 'div', textContent: 'Make your move...', id: 'display-element' });
-    const easyButton = createElement({type: 'button', textContent: 'Easy', id: 'easy-mode-button'});
-    const normalButton = createElement({type: 'button', textContent: 'Normal', id: 'normal-mode-button'});
-    const hardButton = createElement({type: 'button', textContent: 'Hard', id: 'hard-mode-button'});
-    const chooseDifficultyScreen = createElement({type: 'div', id: 'difficulty-container'});
+    const easyButton = createElement({ type: 'button', textContent: 'Easy', id: 'easy-mode-button' });
+    const normalButton = createElement({ type: 'button', textContent: 'Normal', id: 'normal-mode-button' });
+    const hardButton = createElement({ type: 'button', textContent: 'Hard', id: 'hard-mode-button' });
+    const chooseDifficultyScreen = createElement({ type: 'div', id: 'difficulty-container' });
     const selectDifficultyText = createElement({ type: 'h2', textContent: 'Select difficulty:' });
     let clickEventListenerAttached = false;
 
@@ -274,14 +340,14 @@
                 highlightBoxes(result.coordinates);
             }
             return;
-        } 
+        }
         if (Gameboard.getMarker() === 'O' && Game.getMode() === 'Player VS Computer') {
             let computerMove = Game.calculateMove();
             let moveIsSubmitted = Gameboard.updateBoard(computerMove);
             if (moveIsSubmitted) {
                 render();
             }
-        }      
+        }
     }
 
     function chooseDifficulty() {
@@ -303,7 +369,7 @@
         let difficulty = event.composedPath()[0].textContent;
         chooseDifficultyScreen.remove();
         createGameDisplay();
-        Game.newGame('Player VS Computer', difficulty);        
+        Game.newGame('Player VS Computer', difficulty);
     }
 
     function createGameDisplay() {
@@ -374,5 +440,8 @@
 
         return element;
     }
+
+
+
 
 })()
