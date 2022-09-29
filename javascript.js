@@ -141,7 +141,6 @@
         }
 
         function normalMode() {
-            console.log(gameArray)
             if (gameArray[4] === '') {
                 return 4;
             }
@@ -239,7 +238,7 @@
 
         function hardMode() {
             let move = minimax(getGameArray(), 'O').index;
-            return move
+            return move;
         }
 
         function minimax(board, player) {
@@ -299,7 +298,7 @@
         }
 
         return {
-            checkForWinner, updateArray, newGame, restartGame, calculateMove, getMode, getGameArray
+            checkForWinner, updateArray, newGame, restartGame, calculateMove, getMode
         }
     })();
 
@@ -440,8 +439,5 @@
 
         return element;
     }
-
-
-
 
 })()

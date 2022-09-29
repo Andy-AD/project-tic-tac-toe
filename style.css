@@ -52,6 +52,7 @@ h2 {
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: space-around;
 }
 
 #display-element {
@@ -60,8 +61,8 @@ h2 {
 }
 
 #gameboard {
-    height: 600px;
-    width: 600px;
+    height: 470px;
+    width: 470px;
     background-color: var(--main-dark-background-color);
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -74,7 +75,8 @@ h2 {
     font-size: 4em;
 }
 
-#gameboard > div:hover {
+#gameboard > div:hover,
+button:hover {
     cursor: pointer;
 }
 
@@ -110,4 +112,11 @@ footer,
     font-size: 1.2em;
     padding: 10px 0;
     margin-bottom: 0.5em;
+}
+
+#button-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
 }
